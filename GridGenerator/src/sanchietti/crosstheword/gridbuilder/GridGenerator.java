@@ -36,6 +36,10 @@ public class GridGenerator {
 	 * to not be copied
 	 */
 	private int dirt = 1;
+	/**
+	 * this field is used to choose the maximum length oft the words
+	 */
+	private int maxWordLength = 13;
 	
 	/**
 	 * This is the map of row -> TreeSet that contains all the position of the elements. 
@@ -72,7 +76,7 @@ public class GridGenerator {
 	/**
 	 * method used to set the number of black boxes to put in the grid
 	 * @param s
-	 * @return
+	 * @return this
 	 */
 	public GridGenerator setSpaces(int s) {
 		this.spaces = s;
@@ -81,10 +85,20 @@ public class GridGenerator {
 	
 	/**
 	 * method used to set to true the vertical mirroring of the grid
-	 * @return
+	 * @return this
 	 */
 	public GridGenerator setVerticalMirror() {
 		this.vMirror = true;
+		return this;
+	}
+	
+	/**
+	 * method used to set the maximum numbers of characters for the words
+	 * @param i max number
+	 * @return this
+	 */
+	public GridGenerator setMaxWordLength(int i) {
+		this.maxWordLength = i;
 		return this;
 	}
 	
@@ -103,7 +117,11 @@ public class GridGenerator {
 		return this;
 	}
 	
-	public GridGenerator build() {
+	/**
+	 * method that builds the grid
+	 * @return
+	 */
+	public char[][] build() {
 		this.grid = new char[height][width];
 				
 		//calculate the width, the height and the spaces of the 
@@ -137,12 +155,16 @@ public class GridGenerator {
 			}
 		}
 		
+		//------------------
+		//TODO
 		//now i have to parse the columns and the rows and see if there are too long words
 		
 		//parsing columns: i have 2 possibilities:
-		//		1)there is not mirroring (i have to check in every column if there are too long words
+		//		1)there is not mirroring (i have to check in every column if there are too long words)
 		//		2)there is mirroring (i need an other passage that checks if, once the mirroring is done, there will be too long words)
-		
+		//
+		//Do the same for the rows
+		//------------------------------
 		
 		if(oMirror) {
 			for(int x = 0; x < finalHeight; x++)
@@ -156,7 +178,22 @@ public class GridGenerator {
 						grid[j][width-x-1] = grid[j][x];
 				}
 		}
-		return this;
+		
+		//------------
+		//TODO add a check for the mid col\row
+		//------------
+		
+		//------------
+		//TODO add a check for zones that are not connected between eachother
+		//------------
+		
+		
+		return grid;
+	}
+	
+	
+	private void checkDistance() {
+		
 	}
 	
 	@Override
