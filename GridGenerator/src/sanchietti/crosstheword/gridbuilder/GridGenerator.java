@@ -147,7 +147,7 @@ public class GridGenerator {
 			for(int j = 0; j < finalWidth; j++){
 				if(spaceCounter > maxWordLength){
 					//i have to generate a '*' between j and j-maxWordLength
-					int start = j-spaceCounter - 1;
+					int start = j- (spaceCounter);
 					int offset = (int)(Math.random()*spaceCounter);
 					grid[i][start + offset] = '*';
 					//System.out.println("New point at: " + i + " - " + start+offset);
@@ -169,6 +169,37 @@ public class GridGenerator {
 				//System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth - lastPoint));
 			}
 		}
+
+		///////////////////////
+		for(int i = 0; i < finalWidth; i++){
+			int spaceCounter = 0;
+			for(int j = 0; j < finalHeight; j++){
+				if(spaceCounter > maxWordLength){
+					//i have to generate a '*' between j and j-maxWordLength
+					int start = j-spaceCounter - 1;
+					int offset = (int)(Math.random()*spaceCounter);
+					grid[start + offset][i] = '*';
+					//System.out.println("New point at: " + i + " - " + start+offset);
+					//then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				if(((int)grid[j][i]) == 0)
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if(oMirror && spaceCounter*2 > maxWordLength){
+				
+				int lastPoint = 0;
+				do{
+					lastPoint = (int)(Math.random()*(spaceCounter) + 1);
+				}while((lastPoint) * 2 > maxWordLength);
+				grid[finalWidth - lastPoint][i] = '*';
+				//System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth - lastPoint));
+			}
+		}
+
+		///////////////////////
 
 		
 		//Do the same for the rows
