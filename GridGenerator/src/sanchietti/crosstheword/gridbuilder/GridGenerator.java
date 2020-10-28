@@ -38,7 +38,7 @@ public class GridGenerator {
 	 * number between 1 and 10. Higher is the number and higher is the chance of
 	 * every black box to not be copied
 	 */
-	private int dirt = 1;
+	private int dirt = 0;
 	/**
 	 * this field is used to choose the maximum length oft the words
 	 */
@@ -104,7 +104,7 @@ public class GridGenerator {
 	 * 
 	 * @return
 	 */
-	public GridGenerator setOrizontalMirror() {
+	public GridGenerator setHorizontalMirror() {
 		this.oMirror = true;
 		return this;
 	}
@@ -123,6 +123,10 @@ public class GridGenerator {
 	 */
 	public char[][] build() {
 		this.grid = new char[height][width];
+
+		for(int i = 0; i < height; i++)
+			for(int j = 0; j < width; j++)
+			grid[i][j] = ' ';
 
 		// calculate the width, the height and the spaces of the
 		// grid without mirroring
@@ -169,12 +173,12 @@ public class GridGenerator {
 					// then i have to set the spaceCounter to j-positionOfNewPoint
 					spaceCounter = j - (start + offset);
 				}
-				if (((int) grid[i][j]) == 0)
+				if (grid[i][j] == ' ')
 					spaceCounter++;
 				else
 					spaceCounter = 0;
 			}
-			if (vMirror && spaceCounter * 2 > maxWordLength) {
+			if (oMirror && spaceCounter * 2 > maxWordLength) {
 
 				int lastPoint = 0;
 				do {
@@ -199,12 +203,12 @@ public class GridGenerator {
 					// then i have to set the spaceCounter to j-positionOfNewPoint
 					spaceCounter = j - (start + offset);
 				}
-				if (((int) grid[j][i]) == 0)
+				if (grid[j][i] == ' ')
 					spaceCounter++;
 				else
 					spaceCounter = 0;
 			}
-			if (oMirror && spaceCounter * 2 > maxWordLength) {
+			if (vMirror && spaceCounter * 2 > maxWordLength) {
 
 				int lastPoint = 0;
 				do {
@@ -238,6 +242,7 @@ public class GridGenerator {
 		// TODO add a check for zones that are not connected between eachother
 		// ------------
 
+
 		return grid;
 	}
 
@@ -255,16 +260,17 @@ public class GridGenerator {
 
 	public static void main(String[] args) throws IOException {
 		for(int i = 0; i < 10; i ++){
-			char[][] grid = GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build();
+			char[][] grid = GridGenerator.getBuilder().setSize(15, 14).setHorizontalMirror().setVerticalMirror().setMaxWordLength(9).build();
 			//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 			try{
-				FileWriter myWriter = new FileWriter("CrossTheWorld-GridBuilder\\GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
+				FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
 				String s = "";
 				for(int j = 0; j < grid.length; j++){
 					for(int k = 0; k < grid[0].length - 1; k++)
 						s += grid[j][k] + ",";
 					s += grid[j][grid[0].length - 1] + "\n";
 				}
+				System.out.println(s);
 				myWriter.write(s);
 				myWriter.close();
 			}
