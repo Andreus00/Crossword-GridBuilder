@@ -41,18 +41,6 @@ public class GridGenerator {
 	 */
 	private int maxWordLength = 13;
 	
-	/**
-	 * This is the map of row -> TreeSet that contains all the position of the elements. 
-	 * Theese information will be used to check the grid generated (lenght of the words)
-	 */
-	private HashMap<Integer, TreeSet<Integer>> rows = new HashMap<>();
-	/**
-	 * This is the map of colunms -> TreeSet that contains all the position of the elements. 
-	 * Theese information will be used to check the grid generated (lenght of the words)
-	 */
-	private HashMap<Integer, TreeSet<Integer>> columns = new HashMap<>();
-	
-	
 	private final int THETA = 30;
 	
 	private GridGenerator() {
@@ -121,7 +109,7 @@ public class GridGenerator {
 	 * method that builds the grid
 	 * @return
 	 */
-	public char[][] build() {
+	public GridGenerator build() {
 		this.grid = new char[height][width];
 				
 		//calculate the width, the height and the spaces of the 
@@ -129,11 +117,6 @@ public class GridGenerator {
 		int finalWidth = this.width/(1 + (vMirror ? 1 : 0));
 		int finalHeight = this.height/(1 + (oMirror ? 1 : 0));
 		int finalSpaces = this.spaces;
-		
-		for(int i = 0; i < finalHeight; i++)
-			rows.put(i, new TreeSet<>());
-		for(int i = 0; i < finalWidth; i++)
-			columns.put(i, new TreeSet<>());
 		
 		assert finalSpaces < finalWidth * finalHeight;
 		
@@ -147,22 +130,32 @@ public class GridGenerator {
 			if(c != '*') {
 				grid[h][w] = '*';
 				finalSpaces--;
-				
-				//When i add a '*' i have to add his position in the hashmap of the columns and in the hashmap of the rows
-			columns.get(w).add(h);
-			rows.get(h).add(w);
-			
 			}
 		}
 		
 		//------------------
 		//TODO
 		//now i have to parse the columns and the rows and see if there are too long words
-		
 		//parsing columns: i have 2 possibilities:
-		//		1)there is not mirroring (i have to check in every column if there are too long words)
-		//		2)there is mirroring (i need an other passage that checks if, once the mirroring is done, there will be too long words)
-		//
+		//		DONE 1)there is not mirroring (i have to check in every column if there are too long words)
+		//		TODO 2)there is mirroring (i need an other passage that checks if, once the mirroring is done, there will be too long words)
+		
+		for(int i = 0; i < finalHeight; i++){
+			int spaceCounter = 0;
+			for(int j = 0; j < finalWidth; j++){
+				if(spaceCounter > maxWordLength){
+					//i have to generate a '*' between j and j-maxWordLength
+					int start = j-maxWordLength - 1;
+					int offset = (int)(Math.random()*11);
+					grid[i][start + offset] = '*';
+					System.out.println("New point at: " + i + "" + start+offset);
+					//then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				spaceCounter++;
+			}
+		}
+		
 		//Do the same for the rows
 		//------------------------------
 		
@@ -188,12 +181,7 @@ public class GridGenerator {
 		//------------
 		
 		
-		return grid;
-	}
-	
-	
-	private void checkDistance() {
-		
+		return this;
 	}
 	
 	@Override
@@ -209,6 +197,6 @@ public class GridGenerator {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(GridGenerator.getBuilder().setSize(20, 20).setSpaces(20).setOrizontalMirror().setVerticalMirror().setDirt(1).build().toString());
+		System.out.println(GridGenerator.getBuilder().setSize(40, 40).setSpaces(10).setOrizontalMirror().setVerticalMirror().setDirt(1).build().toString());
 	}
 }
