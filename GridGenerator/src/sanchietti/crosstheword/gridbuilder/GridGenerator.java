@@ -1,6 +1,7 @@
 package sanchietti.crosstheword.gridbuilder;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.TreeSet;
 
 public class GridGenerator {
@@ -100,7 +101,8 @@ public class GridGenerator {
 	}
 	
 	public GridGenerator setDirt(int d) {
-		assert d > 0 && d <= 10;
+		if(d < 0 && d >= 10)
+			throw new IllegalArgumentException("The dirt value ca only be 0 <= dirt <= 10");
 		this.dirt = d;
 		return this;
 	}
@@ -125,7 +127,7 @@ public class GridGenerator {
 			int h = (int)(Math.random()*finalHeight);
 			char c = grid[h][w];
 			
-			System.out.println("|"+c+"|");
+			//System.out.println("|"+c+"|");
 			
 			if(c != '*') {
 				grid[h][w] = '*';
@@ -145,16 +147,29 @@ public class GridGenerator {
 			for(int j = 0; j < finalWidth; j++){
 				if(spaceCounter > maxWordLength){
 					//i have to generate a '*' between j and j-maxWordLength
-					int start = j-maxWordLength - 1;
-					int offset = (int)(Math.random()*11);
+					int start = j-spaceCounter - 1;
+					int offset = (int)(Math.random()*spaceCounter);
 					grid[i][start + offset] = '*';
-					System.out.println("New point at: " + i + "" + start+offset);
+					//System.out.println("New point at: " + i + " - " + start+offset);
 					//then i have to set the spaceCounter to j-positionOfNewPoint
 					spaceCounter = j - (start + offset);
 				}
-				spaceCounter++;
+				if(((int)grid[i][j]) == 0)
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if(vMirror && spaceCounter*2 > maxWordLength){
+				
+				int lastPoint = 0;
+				do{
+					lastPoint = (int)(Math.random()*(spaceCounter) + 1);
+				}while((lastPoint) * 2 > maxWordLength);
+				grid[i][finalWidth - lastPoint] = '*';
+				//System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth - lastPoint));
 			}
 		}
+
 		
 		//Do the same for the rows
 		//------------------------------
@@ -197,6 +212,6 @@ public class GridGenerator {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(GridGenerator.getBuilder().setSize(40, 40).setSpaces(10).setOrizontalMirror().setVerticalMirror().setDirt(1).build().toString());
+		System.out.println(GridGenerator.getBuilder().setSize(40, 40).setSpaces(0).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 	}
 }
