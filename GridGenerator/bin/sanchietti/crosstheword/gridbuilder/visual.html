@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .block{
+            background-color: black;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            outline-width: 1px;
+            outline-color: black;
+            outline-style: groove;
+        }
+        .space{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            outline-width: 1px;
+            outline-color: black;
+            outline-style: groove;
+        }
+        div{
+            display: block;
+            margin: -4px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="content"></div>
+    <script>
+var grid = `*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*
+*,*, ,*, ,*,*,*, ,*, ,*, ,*, ,*, ,*, ,*
+*, , , , , , , , , , , ,*, , , , , , ,*
+*,*, ,*, ,*, ,*, ,*, ,*,*,*, ,*, ,*, , 
+*, , , , , , , ,*, , , , , ,*, , , , ,*
+*,*, ,*, , , , , ,*, , ,*,*, ,*, ,*,*,*
+*, , , ,*, , , , , , , , ,*, , , , , ,*
+*,*, ,*, ,*, ,*, ,*, ,*, ,*, ,*, ,*, ,*
+*, , , , , , ,*, , , , , , , , , , , ,*
+*, ,*,*, , , ,*,*, , ,*, , , ,*, ,*,*,*
+*, , , , , , , , ,*, , , , , , ,*, , ,*
+*,*, , , ,*, ,*, , , ,*,*,*, ,*, ,*, ,*
+*, , , , , , , , ,*, , , , , , , , , ,*
+*,*, ,*, ,*, ,*, , ,*,*, , , ,*, ,*, ,*
+*,*, , , , ,*, , , , , , ,*, , , , , ,*
+*,*, ,*, ,*, ,*, , , ,*, ,*, ,*, ,*, ,*
+*, , , ,*,*, , , , , , , , ,*, , , , ,*
+*,*, ,*, , , , , ,*, ,*, , , , ,*,*, ,*
+*, , , , , , , ,*, , , , , , , , , , ,*
+*,*,*,*,*,*,*,*,*,*,*,*,*, ,*,*, , ,*,*
+
+
+`
+var div = document.createElement("div");
+for(let element of grid){
+    if(element == ","){
+        continue;
+    }
+    else if(element == " "){
+        let newLabel = document.createElement("label");
+        newLabel.className = "space";
+        div.appendChild(newLabel);
+    }
+    else if(element == "*"){
+        let newLabel = document.createElement("label");
+        newLabel.className = "block";
+        div.appendChild(newLabel);
+    }
+    else{
+        let aCapo = document.createElement("br");
+        aCapo.className = "aCapo"
+        document.querySelector(".content").appendChild(div);
+        div = document.createElement("div");
+    }
+}
+    </script>
+</body>
+</html>

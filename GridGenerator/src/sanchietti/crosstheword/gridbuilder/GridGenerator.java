@@ -260,10 +260,10 @@ public class GridGenerator {
 
 	public static void main(String[] args) throws IOException {
 		for(int i = 0; i < 10; i ++){
-			char[][] grid = GridGenerator.getBuilder().setSize(14,14).setSpaces(9).setHorizontalMirror().setVerticalMirror().setMaxWordLength(10).buildEng();
+			char[][] grid = GridGenerator.getBuilder().setSize(20,20).setSpaces(9).setHorizontalMirror().setVerticalMirror().setMaxWordLength(12).buildEng();
 			//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 			try{
-				FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
+				FileWriter myWriter = new FileWriter("CrossTheWorld-GridBuilder\\GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
 				String s = "";
 				for(int j = 0; j < grid.length; j++){
 					for(int k = 0; k < grid[0].length - 1; k++)
