@@ -260,7 +260,7 @@ public class GridGenerator {
 
 	public static void main(String[] args) throws IOException {
 		for(int i = 0; i < 10; i ++){
-			char[][] grid = GridGenerator.getBuilder().setSize(20,20).setSpaces(25).setHorizontalMirror().setVerticalMirror().setMaxWordLength(12).build();
+			char[][] grid = GridGenerator.getBuilder().setSize(14,14).setSpaces(9).setHorizontalMirror().setVerticalMirror().setMaxWordLength(10).buildEng();
 			//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 			try{
 				FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
@@ -283,7 +283,78 @@ public class GridGenerator {
 
 
 
-	
+	public char[][] buildEng() {
+
+		this.grid = new char[height][width];
+
+		for(int i = 0; i < height; i++)
+			for(int j = 0; j < width; j++)
+				grid[i][j] = ((i % 2 == 1 && j % 2 == 1) || i == 0 || i == height-1 || j == 0 || j == width - 1) && !(Math.random()*100 < 15) ? '*' : ' ';
+
+		
+		///////////////// rows
+		for (int i = 0; i < height; i++) {
+			int spaceCounter = 0;
+			for (int j = 0; j < width; j++) {
+				if (spaceCounter > maxWordLength) {
+
+					// i have to generate a '*' between j and j-maxWordLength
+					int start = j - (spaceCounter);
+					int offset = (int) (Math.random() * spaceCounter);
+					grid[i][start + offset] = '*';
+
+					// then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				if (grid[i][j] == ' ')
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if (oMirror && spaceCounter * 2 > maxWordLength) {
+
+				int lastPoint = 0;
+				do {
+					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
+				} while ((lastPoint) * 2 > maxWordLength);
+				grid[i][width - lastPoint] = '*';
+				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
+				// lastPoint));
+			}
+		}
+
+		/////////////////////// Columns
+		for (int i = 0; i < width; i++) {
+			int spaceCounter = 0;
+			for (int j = 0; j < height; j++) {
+				if (spaceCounter > maxWordLength) {
+					// i have to generate a '*' between j and j-maxWordLength
+					int start = j - spaceCounter;
+					int offset = (int) (Math.random() * spaceCounter);
+					grid[start + offset][i] = '*';
+					// System.out.println("New point at: " + i + " - " + start+offset);
+					// then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				if (grid[j][i] == ' ')
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if (vMirror && spaceCounter * 2 > maxWordLength) {
+
+				int lastPoint = 0;
+				do {
+					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
+				} while ((lastPoint) * 2 > maxWordLength);
+				grid[width - lastPoint][i] = '*';
+				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
+				// lastPoint));
+			}
+		}
+
+		return grid;
+	}
 
 
 }
