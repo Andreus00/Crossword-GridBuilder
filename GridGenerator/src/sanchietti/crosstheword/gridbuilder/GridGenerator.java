@@ -196,7 +196,7 @@ public class GridGenerator {
 			for (int j = 0; j < finalHeight; j++) {
 				if (spaceCounter > maxWordLength) {
 					// i have to generate a '*' between j and j-maxWordLength
-					int start = j - spaceCounter - 1;
+					int start = j - spaceCounter;
 					int offset = (int) (Math.random() * spaceCounter);
 					grid[start + offset][i] = '*';
 					// System.out.println("New point at: " + i + " - " + start+offset);
@@ -260,7 +260,7 @@ public class GridGenerator {
 
 	public static void main(String[] args) throws IOException {
 		for(int i = 0; i < 10; i ++){
-			char[][] grid = GridGenerator.getBuilder().setSize(15, 14).setHorizontalMirror().setVerticalMirror().setMaxWordLength(9).build();
+			char[][] grid = GridGenerator.getBuilder().setSize(20,20).setSpaces(25).setHorizontalMirror().setVerticalMirror().setMaxWordLength(12).build();
 			//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 			try{
 				FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
@@ -280,4 +280,10 @@ public class GridGenerator {
 		}
 		
 	}
+
+
+
+	
+
+
 }
