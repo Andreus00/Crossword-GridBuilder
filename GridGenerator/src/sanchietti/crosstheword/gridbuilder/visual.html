@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
     <style>
         .block{
             background-color: black;
@@ -12,7 +13,7 @@
             height: 20px;
             outline-width: 1px;
             outline-color: black;
-            outline-style: groove;
+            outline-style: auto;
         }
         .space{
             display: inline-block;
@@ -20,13 +21,14 @@
             height: 20px;
             outline-width: 1px;
             outline-color: black;
-            outline-style: groove;
+            outline-style: auto;
         }
         div{
             display: block;
             margin: -4px auto;
         }
     </style>
+
 </head>
 <body>
     <input type="file" id="file-input" multiple/>
@@ -41,79 +43,77 @@
 
     <script>
 
-var content = document.querySelector(".content")
+    var content = document.querySelector(".content")
 
-var grid = ""
+    var grid = ""
 
-var grids = [];
-var index = 0;
+    var grids = [];
+    var index = 0;
 
-var reader;
+    var reader;
 
-////////////////////////////////////
-function readMultipleFiles(e) {
-    index = 0;
-    grids = [];
-    grid = [];
-    renderGrid()
-    for (var i = 0; i < e.target.files.length; i++){
-        grids.push(e.target.files[i]);
+    ////////////////////////////////////
+    function readMultipleFiles(e) {
+        index = 0;
+        grids = [];
+        grid = [];
+        renderGrid()
+        for (var i = 0; i < e.target.files.length; i++){
+            grids.push(e.target.files[i]);
+        }
+        if(!grids.length){
+            return;
+        }
+        reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            displayContents(contents);
+        };
+        index = 0;
+        reader.readAsText(grids[index]);
     }
-    if(!grids.length){
-        return;
+
+    function displayContents(contents) {
+        grid = contents;
+        document.querySelector("body").removeChild(content)
+        content = document.createElement("div")
+        content.className = "content"
+        document.querySelector("body").appendChild(content)
+        renderGrid()
     }
-    reader = new FileReader();
-    reader.onload = function(e) {
-        var contents = e.target.result;
-        displayContents(contents);
-    };
-    index = 0;
-    reader.readAsText(grids[index]);
-}
 
-function displayContents(contents) {
-    grid = contents;
-    document.querySelector("body").removeChild(content)
-    content = document.createElement("div")
-    content.className = "content"
-    document.querySelector("body").appendChild(content)
-    renderGrid()
-}
-
-document.getElementById('file-input')
-  .addEventListener('change', readMultipleFiles, false);
+    document.getElementById('file-input')
+    .addEventListener('change', readMultipleFiles, false);
 
 
-//////////////////////
+    //////////////////////
 
-renderGrid();
+    renderGrid();
 
-function renderGrid(){
-    var div = document.createElement("div");
-    for(let element of grid){
-        if(element == ","){
-            continue;
-        }
-        else if(element == " "){
-            let newLabel = document.createElement("label");
-            newLabel.className = "space";
-            
-            div.appendChild(newLabel);
-        }
-        else if(element == "*"){
-            let newLabel = document.createElement("label");
-            newLabel.className = "block";
-            div.appendChild(newLabel);
-        }
-        else{
-            let aCapo = document.createElement("br");
-            aCapo.className = "aCapo"
-            content.appendChild(div);
-            div = document.createElement("div");
+    function renderGrid(){
+        var div = document.createElement("div");
+        for(let element of grid){
+            if(element == ","){
+                continue;
+            }
+            else if(element == " "){
+                let newLabel = document.createElement("label");
+                newLabel.className = "space";
+                div.appendChild(newLabel);
+            }
+            else if(element == "*"){
+                let newLabel = document.createElement("label");
+                newLabel.className = "block";
+                div.appendChild(newLabel);
+            }
+            else{
+                let aCapo = document.createElement("br");
+                aCapo.className = "aCapo"
+                content.appendChild(div);
+                div = document.createElement("div");
+            }
         }
     }
-}
-
 
     function previous(){
         if(index > 0){
