@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 public class GridGenerator {
 
@@ -24,7 +26,7 @@ public class GridGenerator {
 	/**
 	 * number of spaces to generate
 	 */
-	private int spaces;
+	private int blocks;
 	/**
 	 * orizontal mirror
 	 */
@@ -71,8 +73,8 @@ public class GridGenerator {
 	 * @param s
 	 * @return this
 	 */
-	public GridGenerator setSpaces(int s) {
-		this.spaces = s;
+	public GridGenerator setBlocks(int s) {
+		this.blocks = s;
 		return this;
 	}
 
@@ -116,7 +118,7 @@ public class GridGenerator {
 	
 	int finalWidth;
 	int finalHeight;
-	int finalSpaces;
+	int finalBlocks;
 	
 	/**
 	 * method that builds the grid
@@ -134,11 +136,11 @@ public class GridGenerator {
 		// grid without mirroring
 		finalWidth = this.width / (1 + (vMirror ? 1 : 0));
 		finalHeight = this.height / (1 + (oMirror ? 1 : 0));
-		finalSpaces = this.spaces;
+		finalBlocks = this.blocks;
 
-		assert finalSpaces < finalWidth * finalHeight;
+		assert finalBlocks < finalWidth * finalHeight;
 
-		while (finalSpaces > 0) {
+		while (finalBlocks > 0) {
 			int w = (int) (Math.random() * finalWidth);
 			int h = (int) (Math.random() * finalHeight);
 			char c = grid[h][w];
@@ -147,7 +149,7 @@ public class GridGenerator {
 
 			if (c != '*') {
 				grid[h][w] = '*';
-				finalSpaces--;
+				finalBlocks--;
 			}
 		}
 		
@@ -169,8 +171,6 @@ public class GridGenerator {
 
 		checkGrid();
 		
-		System.out.println(checkMaxWordsLength());
-		
 		return grid;
 	}
 
@@ -182,6 +182,10 @@ public class GridGenerator {
 		}while(checkMaxWordsLength());
 	}
 
+	/**
+	 * returns true if the function has changed something in the grid
+	 * @return
+	 */
 	private boolean checkMaxWordsLength(){
 		// now i have to parse the columns and the rows and see if there are too long
 		// words
@@ -247,7 +251,7 @@ public class GridGenerator {
 				do {
 					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
 				} while ((lastPoint) * 2 > maxWordLength);
-				grid[finalWidth - lastPoint][i] = '*';
+				grid[finalHeight - lastPoint][i] = '*';
 				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
 				// lastPoint));
 			}
@@ -267,81 +271,57 @@ public class GridGenerator {
 		return s;
 	}
 
-	public static void main(String[] args) throws IOException {
-		int k = 0;
-		try{
-			for(k = 0; k < 100000; k++){
-				char[][] grid = GridGenerator.getBuilder().setSize(50,50).setSpaces(1000).setMaxWordLength(12).buildEng();
+	public static void main(String[] args) {
+		int a = 0;
+		String type = "ITA";
 
-				for (int i = 0; i < grid.length; i++) {
-					int spaceCounter = 0;
-					for (int j = 0; j < grid[0].length; j++) {
-						if (spaceCounter > 12) {
+		for(int height = 8; height <= 30; height++){
+			for(int width = height; width <= 30; width++){
+				try{
+					for(a = 0; a < 1; a++){
+						char[][] grid = GridGenerator.getBuilder().setSize(width, height).setHorizontalMirror().setVerticalMirror().setBlocks(width * height / 7).setMaxWordLength(12).build();
+
+						// if(grid.checkMaxWordsLength()){
+						// 	System.out.println("Length");
+						// 	System.out.println(grid.toString());
+						// 	throw new Error();
+						// }
+						// if(!grid.checkConnections()){
+						// 	System.out.println("Connections");
+						// 	System.out.println(grid.toString());
+						// 	throw new Error();
+						// }
+
+						// System.out.println(a);
+						// System.out.println(grid.toString());
+
+						// // s.next();
+						
+
+						//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
+						try{
+							FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\gridItaTest\\grid_" + width + "x" + height + "_" + type + "_" +a+".txt");
 							String s = "";
-							for(int a = 0; a < grid.length; a++){
-								for(int b = 0; b < grid[0].length - 1; b++)
-									s += grid[a][b] + ",";
-								s += grid[a][grid[0].length - 1] + "\n";
+							for(int j = 0; j < height; j++){
+								for(int k = 0; k < width - 1; k++)
+									s += grid[j][k] + ",";
+								s += grid[j][width - 1] + "\n";
 							}
-							System.out.println(s);
-							throw new Error("Errore - " + k + "  -   posizione: Riga " + i + "    Colonna " + j);
 							
+							myWriter.write(s);
+							myWriter.close();
 						}
-						if (grid[i][j] == ' ')
-							spaceCounter++;
-						else
-							spaceCounter = 0;
+						catch(IOException e){
+							e.printStackTrace();
+						}
 					}
 				}
-		
-				/////////////////////// Columns
-				for (int i = 0; i < grid[0].length; i++) {
-					int spaceCounter = 0;
-					for (int j = 0; j < grid.length; j++) {
-						if (spaceCounter > 12) {
-
-
-							String s = "";
-							for(int a = 0; a < grid.length; a++){
-								for(int b = 0; b < grid[0].length - 1; b++)
-									s += grid[a][b] + ",";
-								s += grid[a][grid[0].length - 1] + "\n";
-							}
-							System.out.println(s);
-							throw new Error("Errore - " + k + "  -   posizione: Riga " + j + "    Colonna " + i);
-						}
-						if (grid[j][i] == ' ')
-							spaceCounter++;
-						else
-							spaceCounter = 0;
-					}
+				catch(IndexOutOfBoundsException e){
+					System.out.println("Error In Main");
+					System.out.println(a);
+					e.printStackTrace();
 				}
-
-				System.out.println(k);
-
-
-				//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
-				// try{
-				// 	FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
-				// 	String s = "";
-				// 	for(int j = 0; j < grid.length; j++){
-				// 		for(int k = 0; k < grid[0].length - 1; k++)
-				// 			s += grid[j][k] + ",";
-				// 		s += grid[j][grid[0].length - 1] + "\n";
-				// 	}
-				// 	System.out.println(s);
-				// 	myWriter.write(s);
-				// 	myWriter.close();
-				// }
-				// catch(IOException e){
-				// 	e.printStackTrace();
-				// }
 			}
-		}
-		catch(IndexOutOfBoundsException e){
-			System.out.println("Error In Main");
-			System.out.println(k);
-			System.out.println(e);
 		}
 		System.out.println("finished");
 	}
@@ -470,9 +450,14 @@ public class GridGenerator {
 
 	private HashSet<Zone> zones = new HashSet<>();
 
-	private void checkConnections(){
+
+	/**
+	 * returns true if there is only 1 zone
+	 * @return
+	 */
+	private boolean checkConnections(){
 		createZones();
-		mergeZones();
+		return mergeZones();
 	}
 
 
@@ -481,6 +466,7 @@ public class GridGenerator {
 	 */
 	private void 
 	createZones(){
+		zones = new HashSet<>();
 		boxGrid = new Box[height][width];
 		for(int i = 0; i < height; i++)
 			for(int j = 0; j < width; j++)
@@ -502,10 +488,16 @@ public class GridGenerator {
 
 	private int attemps = 10;
 
-	private void mergeZones(){
+	/**
+	 * returns true if there is only 1 zone
+	 * @return
+	 */
+	private boolean mergeZones() {
 		List<Zone> zonesList = new ArrayList<>(zones);
 		
 		int zoneNumber = zonesList.size();
+		if(zoneNumber == 1)
+			return true;
 		while(zoneNumber > 1){
 			zoneNumber = zonesList.size();
 			boolean hasMerged = false;
@@ -559,6 +551,7 @@ public class GridGenerator {
 				
 			}
 		}
+		return false;
 	}
 
 	private void tryDelete(List<Zone> zonesList) {
