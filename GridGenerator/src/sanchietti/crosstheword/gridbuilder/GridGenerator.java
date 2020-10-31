@@ -113,7 +113,11 @@ public class GridGenerator {
 		this.dirt = d;
 		return this;
 	}
-
+	
+	int finalWidth;
+	int finalHeight;
+	int finalSpaces;
+	
 	/**
 	 * method that builds the grid
 	 * 
@@ -128,9 +132,9 @@ public class GridGenerator {
 
 		// calculate the width, the height and the spaces of the
 		// grid without mirroring
-		int finalWidth = this.width / (1 + (vMirror ? 1 : 0));
-		int finalHeight = this.height / (1 + (oMirror ? 1 : 0));
-		int finalSpaces = this.spaces;
+		finalWidth = this.width / (1 + (vMirror ? 1 : 0));
+		finalHeight = this.height / (1 + (oMirror ? 1 : 0));
+		finalSpaces = this.spaces;
 
 		assert finalSpaces < finalWidth * finalHeight;
 
@@ -146,82 +150,8 @@ public class GridGenerator {
 				finalSpaces--;
 			}
 		}
-
-		// ------------------
-		// TODO
-		// now i have to parse the columns and the rows and see if there are too long
-		// words
-		// parsing columns: i have 2 possibilities:
-		// DONE 1)there is not mirroring (i have to check in every column if there are
-		// too long words)
-		// TODO 2)there is mirroring (i need an other passage that checks if, once the
-		// mirroring is done, there will be too long words)
-
-		///////////////// rows
-		for (int i = 0; i < finalHeight; i++) {
-			int spaceCounter = 0;
-			for (int j = 0; j < finalWidth; j++) {
-				if (spaceCounter > maxWordLength) {
-
-					// i have to generate a '*' between j and j-maxWordLength
-					int start = j - (spaceCounter);
-					int offset = (int) (Math.random() * spaceCounter);
-					grid[i][start + offset] = '*';
-
-					// then i have to set the spaceCounter to j-positionOfNewPoint
-					spaceCounter = j - (start + offset);
-				}
-				if (grid[i][j] == ' ')
-					spaceCounter++;
-				else
-					spaceCounter = 0;
-			}
-			if (oMirror && spaceCounter * 2 > maxWordLength) {
-
-				int lastPoint = 0;
-				do {
-					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
-				} while ((lastPoint) * 2 > maxWordLength);
-				grid[i][finalWidth - lastPoint] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
-			}
-		}
-
-		/////////////////////// Columns
-		for (int i = 0; i < finalWidth; i++) {
-			int spaceCounter = 0;
-			for (int j = 0; j < finalHeight; j++) {
-				if (spaceCounter > maxWordLength) {
-					// i have to generate a '*' between j and j-maxWordLength
-					int start = j - spaceCounter;
-					int offset = (int) (Math.random() * spaceCounter);
-					grid[start + offset][i] = '*';
-					// System.out.println("New point at: " + i + " - " + start+offset);
-					// then i have to set the spaceCounter to j-positionOfNewPoint
-					spaceCounter = j - (start + offset);
-				}
-				if (grid[j][i] == ' ')
-					spaceCounter++;
-				else
-					spaceCounter = 0;
-			}
-			if (vMirror && spaceCounter * 2 > maxWordLength) {
-
-				int lastPoint = 0;
-				do {
-					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
-				} while ((lastPoint) * 2 > maxWordLength);
-				grid[finalWidth - lastPoint][i] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
-			}
-		}
-
-		///////////////////////
-
-		// Do the same for the rows
-		// ------------------------------
+		
+		checkConnections();
 
 		if (oMirror) {
 			for (int x = 0; x < finalHeight; x++)
@@ -237,12 +167,92 @@ public class GridGenerator {
 				}
 		}
 
-		// ------------
-		// TODO add a check for zones that are not connected between eachother
-		// ------------
-		checkConnections();
+		checkGrid();
+		
+		System.out.println(checkMaxWordsLength());
 		
 		return grid;
+	}
+
+	private void checkGrid(){
+		finalWidth = width;
+		finalHeight = height;
+		do{
+			checkConnections();
+		}while(checkMaxWordsLength());
+	}
+
+	private boolean checkMaxWordsLength(){
+		// now i have to parse the columns and the rows and see if there are too long
+		// words
+		// parsing columns: i have 2 possibilities:
+		// 1)	there is not mirroring (i have to check in every column if there are
+		// 			too long words)
+		// 2)	there is mirroring (i need an other passage that checks if, once the
+		// 			mirroring is done, there will be too long words)
+		boolean isChanged = false;
+		///////////////// rows
+		for (int i = 0; i < finalHeight; i++) {
+			int spaceCounter = 0;
+			for (int j = 0; j < finalWidth; j++) {
+				if (spaceCounter > maxWordLength) {
+					isChanged = true;
+					// i have to generate a '*' between j and j-maxWordLength
+					int start = j - (spaceCounter);
+					int offset = (int) (Math.random() * spaceCounter);
+					grid[i][start + offset] = '*';
+
+					// then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				if (grid[i][j] == ' ')
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if (oMirror && spaceCounter * 2 > maxWordLength) {
+				isChanged = true;
+				int lastPoint = 0;
+				do {
+					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
+				} while ((lastPoint) * 2 > maxWordLength);
+				grid[i][finalWidth - lastPoint] = '*';
+				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
+				// lastPoint));
+			}
+		}
+
+		/////////////////////// Columns
+		for (int i = 0; i < finalWidth; i++) {
+			int spaceCounter = 0;
+			for (int j = 0; j < finalHeight; j++) {
+				if (spaceCounter > maxWordLength) {
+					isChanged = true;
+					// i have to generate a '*' between j and j-maxWordLength
+					int start = j - spaceCounter;
+					int offset = (int) (Math.random() * spaceCounter);
+					grid[start + offset][i] = '*';
+					// System.out.println("New point at: " + i + " - " + start+offset);
+					// then i have to set the spaceCounter to j-positionOfNewPoint
+					spaceCounter = j - (start + offset);
+				}
+				if (grid[j][i] == ' ')
+					spaceCounter++;
+				else
+					spaceCounter = 0;
+			}
+			if (vMirror && spaceCounter * 2 > maxWordLength) {
+				isChanged = true;
+				int lastPoint = 0;
+				do {
+					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
+				} while ((lastPoint) * 2 > maxWordLength);
+				grid[finalWidth - lastPoint][i] = '*';
+				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
+				// lastPoint));
+			}
+		}
+		return isChanged;
 	}
 
 	@Override
@@ -258,10 +268,58 @@ public class GridGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		int i = 0;
+		int k = 0;
 		try{
-			for(i = 0; i < 1000000; i++){
-				char[][] grid = GridGenerator.getBuilder().setSize(20,20).setSpaces(9).setHorizontalMirror().setVerticalMirror().setMaxWordLength(12).build();
+			for(k = 0; k < 100000; k++){
+				char[][] grid = GridGenerator.getBuilder().setSize(50,50).setSpaces(1000).setMaxWordLength(12).buildEng();
+
+				for (int i = 0; i < grid.length; i++) {
+					int spaceCounter = 0;
+					for (int j = 0; j < grid[0].length; j++) {
+						if (spaceCounter > 12) {
+							String s = "";
+							for(int a = 0; a < grid.length; a++){
+								for(int b = 0; b < grid[0].length - 1; b++)
+									s += grid[a][b] + ",";
+								s += grid[a][grid[0].length - 1] + "\n";
+							}
+							System.out.println(s);
+							throw new Error("Errore - " + k + "  -   posizione: Riga " + i + "    Colonna " + j);
+							
+						}
+						if (grid[i][j] == ' ')
+							spaceCounter++;
+						else
+							spaceCounter = 0;
+					}
+				}
+		
+				/////////////////////// Columns
+				for (int i = 0; i < grid[0].length; i++) {
+					int spaceCounter = 0;
+					for (int j = 0; j < grid.length; j++) {
+						if (spaceCounter > 12) {
+
+
+							String s = "";
+							for(int a = 0; a < grid.length; a++){
+								for(int b = 0; b < grid[0].length - 1; b++)
+									s += grid[a][b] + ",";
+								s += grid[a][grid[0].length - 1] + "\n";
+							}
+							System.out.println(s);
+							throw new Error("Errore - " + k + "  -   posizione: Riga " + j + "    Colonna " + i);
+						}
+						if (grid[j][i] == ' ')
+							spaceCounter++;
+						else
+							spaceCounter = 0;
+					}
+				}
+
+				System.out.println(k);
+
+
 				//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 				// try{
 				// 	FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\grid"+i+".txt");
@@ -281,56 +339,11 @@ public class GridGenerator {
 			}
 		}
 		catch(IndexOutOfBoundsException e){
-			System.out.println(i);
+			System.out.println("Error In Main");
+			System.out.println(k);
 			System.out.println(e);
 		}
 		System.out.println("finished");
-
-
-		// for(int i = 0; i < 10000; i++){
-		// 	GridGenerator g = GridGenerator.getBuilder();
-		// 	g.height = 32;
-		// 	g.width = 32;
-		// 	g.grid = new char[][]{
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', ' '},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 		{' ', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*','*', '*', '*', '*', '*', '*', '*', '*'},
-		// 	};
-		// 	g.checkConnections();
-
-		// 	System.out.println(g.toString());
-
-		// }
-		
 	}
 
 
@@ -342,68 +355,7 @@ public class GridGenerator {
 			for(int j = 0; j < width; j++)
 				grid[i][j] = ((i % 2 == 1 && j % 2 == 1) || i == 0 || i == height-1 || j == 0 || j == width - 1) && !(Math.random()*100 < 15) ? '*' : ' ';
 
-		
-		///////////////// rows
-		for (int i = 0; i < height; i++) {
-			int spaceCounter = 0;
-			for (int j = 0; j < width; j++) {
-				if (spaceCounter > maxWordLength) {
-
-					// i have to generate a '*' between j and j-maxWordLength
-					int start = j - (spaceCounter);
-					int offset = (int) (Math.random() * spaceCounter);
-					grid[i][start + offset] = '*';
-
-					// then i have to set the spaceCounter to j-positionOfNewPoint
-					spaceCounter = j - (start + offset);
-				}
-				if (grid[i][j] == ' ')
-					spaceCounter++;
-				else
-					spaceCounter = 0;
-			}
-			if (oMirror && spaceCounter * 2 > maxWordLength) {
-
-				int lastPoint = 0;
-				do {
-					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
-				} while ((lastPoint) * 2 > maxWordLength);
-				grid[i][width - lastPoint] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
-			}
-		}
-
-		/////////////////////// Columns
-		for (int i = 0; i < width; i++) {
-			int spaceCounter = 0;
-			for (int j = 0; j < height; j++) {
-				if (spaceCounter > maxWordLength) {
-					// i have to generate a '*' between j and j-maxWordLength
-					int start = j - spaceCounter;
-					int offset = (int) (Math.random() * spaceCounter);
-					grid[start + offset][i] = '*';
-					// System.out.println("New point at: " + i + " - " + start+offset);
-					// then i have to set the spaceCounter to j-positionOfNewPoint
-					spaceCounter = j - (start + offset);
-				}
-				if (grid[j][i] == ' ')
-					spaceCounter++;
-				else
-					spaceCounter = 0;
-			}
-			if (vMirror && spaceCounter * 2 > maxWordLength) {
-
-				int lastPoint = 0;
-				do {
-					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
-				} while ((lastPoint) * 2 > maxWordLength);
-				grid[width - lastPoint][i] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
-			}
-		}
-		checkConnections();
+		checkGrid();
 
 		return grid;
 	}
@@ -527,7 +479,8 @@ public class GridGenerator {
 	/**
 	 * this function gets the grid and created the zones of the grid
 	 */
-	private void createZones(){
+	private void 
+	createZones(){
 		boxGrid = new Box[height][width];
 		for(int i = 0; i < height; i++)
 			for(int j = 0; j < width; j++)
@@ -547,7 +500,7 @@ public class GridGenerator {
 			}
 	}
 
-	private int attemps = 5;
+	private int attemps = 10;
 
 	private void mergeZones(){
 		List<Zone> zonesList = new ArrayList<>(zones);
@@ -598,10 +551,8 @@ public class GridGenerator {
 					zonesList = new ArrayList<>(zones);
 					zoneNumber = zones.size();
 					
-					if(attemps < 1){
-						System.err.println(toString());
-						System.out.println(zoneNumber);
-						return;
+					if(attemps < 1 && zoneNumber > 1){
+						throw new IndexOutOfBoundsException();
 					}
 					attemps--;
 				}
