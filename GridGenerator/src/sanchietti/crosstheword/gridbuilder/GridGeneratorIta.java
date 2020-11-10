@@ -1,13 +1,12 @@
 package sanchietti.crosstheword.gridbuilder;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
-public class GridGeneratorIta extends GridGenerator{
+public class GridGeneratorIta extends GridGenerator {
 
 	private GridGeneratorIta() {
 		super();
-    }
+	}
 
 	public static GridGeneratorIta getBuilder() {
 		return new GridGeneratorIta();
@@ -17,9 +16,10 @@ public class GridGeneratorIta extends GridGenerator{
 	 * method that builds the grid
 	 * 
 	 * @return
+	 * @throws TimeoutException
 	 */
 	@Override
-	public char[][] build() {
+	public char[][] build() throws TimeoutException {
 		this.grid = new char[height][width];
 		if(minWordLength > maxWordLength/2){
 			minWordLength = 3;

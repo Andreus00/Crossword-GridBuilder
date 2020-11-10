@@ -1,5 +1,7 @@
 package sanchietti.crosstheword.gridbuilder;
 
+import java.util.concurrent.TimeoutException;
+
 public abstract class GridGenerator {
 
 	/**
@@ -42,6 +44,9 @@ public abstract class GridGenerator {
 	 * this is the checker used to see if a grid is valid or not
 	 */
 	protected GridChecker gridChecker;
+
+	protected final int TIMEOUT = 1; //sec
+	protected double beginTime;
 
 	protected int finalWidth;
 	protected int finalHeight;
@@ -124,14 +129,18 @@ public abstract class GridGenerator {
 	 * method that builds the grid
 	 * 
 	 * @return
+	 * @throws TimeoutException
 	 */
-	public abstract char[][] build();
+	public abstract char[][] build() throws TimeoutException;
 
-	protected void checkGrid() {
+	protected void checkGrid() throws TimeoutException {
+		beginTime = System.nanoTime()/1e9;
 		gridChecker.finalWidth = width;
 		gridChecker.finalHeight = height;
 		do {
 			this.gridChecker.checkConnections();
+			if(System.nanoTime()/1e9 - beginTime > 1)
+				throw new TimeoutException("time out");
 		} while (this.gridChecker.checkWordsLength());
 	}
 

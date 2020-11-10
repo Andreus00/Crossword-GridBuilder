@@ -176,7 +176,7 @@ public class GridChecker {
 			}
 	}
 
-	private int attemps = 10;
+	private int attemps = 15;
 
 	/**
 	 * returns true if there is only 1 zone
@@ -234,7 +234,7 @@ public class GridChecker {
 					zoneNumber = zones.size();
 					
 					if(attemps < 1 && zoneNumber > 1){
-						throw new IndexOutOfBoundsException();
+						throw new IndexOutOfBoundsException("Out of attemps");
 					}
 					attemps--;
 				}
