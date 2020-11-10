@@ -9,17 +9,20 @@ public class GridChecker {
     private int width;
 	private int height;
 	private int maxWordLength = 13;
+	private int minWordLength = 3;
+	
 
 	private char[][] grid;
 	
 	private boolean oMirror;
 	private boolean vMirror;
 
-    public GridChecker(char[][] g, int w, int h, int blocks, int maxWL, boolean oM, boolean vM){
+    public GridChecker(char[][] g, int w, int h, int blocks, int maxWL, int minWL, boolean oM, boolean vM){
         this.grid = g;
         this.height = h;
 		this.width = w;
 		this.maxWordLength = maxWL;
+		this.minWordLength = minWL;
 		this.oMirror = oM;
 		this.vMirror = vM;
 		this.finalWidth = this.width / (1 + (vMirror ? 1 : 0));
@@ -337,7 +340,7 @@ public class GridChecker {
 	 * returns true if the function has changed something in the grid
 	 * @return
 	 */
-	public boolean checkMaxWordsLength(){
+	public boolean checkWordsLength(){
 		// now i have to parse the columns and the rows and see if there are too long
 		// words
 		// parsing columns: i have 2 possibilities:
@@ -362,6 +365,21 @@ public class GridChecker {
 				}
 				if (grid[i][j] == ' ')
 					spaceCounter++;
+				//check for the minwordlen in rows
+				else if(spaceCounter < minWordLength && spaceCounter != 1 && spaceCounter != 0){
+					isChanged = true;
+					int newWordLen = (int)(Math.random()*(Math.min(maxWordLength, 4))) + minWordLength;
+					if(j - newWordLen >= 0)
+						for(int k = j - spaceCounter; k > j - newWordLen; k--){
+							grid[i][k] = ' ';
+						}
+					else{
+						for(int k = j; k < j + newWordLen - spaceCounter; k++){
+							grid[i][k] = ' ';
+						}
+					}
+				}
+
 				else
 					spaceCounter = 0;
 			}
@@ -393,6 +411,20 @@ public class GridChecker {
 				}
 				if (grid[j][i] == ' ')
 					spaceCounter++;
+				//check for minwordslen for columns
+				else if(spaceCounter < minWordLength && spaceCounter != 1 && spaceCounter != 0){
+					isChanged = true;
+					int newWordLen = (int)(Math.random()*(Math.min(maxWordLength, 4))) + minWordLength;
+					if(j - newWordLen >= 0)
+						for(int k = j - spaceCounter; k > j - newWordLen; k--){
+							grid[k][i] = ' ';
+						}
+					else{
+						for(int k = j; k < j + newWordLen - spaceCounter; k++){
+							grid[k][i] = ' ';
+						}
+					}
+				}
 				else
 					spaceCounter = 0;
 			}

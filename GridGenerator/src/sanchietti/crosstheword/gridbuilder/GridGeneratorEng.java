@@ -14,14 +14,21 @@ public class GridGeneratorEng extends GridGenerator{
 	public char[][] build() {
 
 		this.grid = new char[height][width];
+		if(minWordLength > maxWordLength/2){
+			minWordLength = 3;
+			System.out.println("minWordLength not allowed, it will be automatically set to the default value " + 3);
+		}
 
-		this.gridChecker = new GridChecker(grid, width, height, blocks, maxWordLength, oMirror, vMirror);
+		this.gridChecker = new GridChecker(grid, width, height, blocks, maxWordLength, minWordLength, oMirror, vMirror);
 
 		for(int i = 0; i < height; i++)
 			for(int j = 0; j < width; j++)
 				grid[i][j] = ((i % 2 == 1 && j % 2 == 1) || i == 0 || i == height-1 || j == 0 || j == width - 1) && !(Math.random()*100 < 10) ? '*' : ' ';
 
 		checkGrid();
+
+		EngLenChecker elc = new EngLenChecker(grid, maxWordLength, minWordLength);
+		elc.map();
 
 		return grid;
 	}

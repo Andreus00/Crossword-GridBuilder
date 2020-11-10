@@ -7,6 +7,10 @@ public class EngLenChecker {
 
     private HashMap<Integer, Double> wordFrequence;
     private char[][] grid;
+    private int width;
+    private int height;
+    private int minWordLength;
+    private int maxWordLength;
 
     private void setFreq(){
         this.wordFrequence = new HashMap<>();
@@ -14,17 +18,19 @@ public class EngLenChecker {
         this.wordFrequence.putAll(Map.of(12, 3.792, 13, 2.329, 14, 1.232, 15, 0.685, 16, 0.290, 17, 0.162, 18, 0.066, 19, 0.041, 20, 0.016));
     }
 
-    public EngLenChecker(char[][] grid){
+    public EngLenChecker(char[][] grid, int maxWL, int minWL){
         setFreq();
         this.grid = grid;
+        this.maxWordLength = maxWL;
+        this.minWordLength = minWL;
     }
 
-    public void map(){
-        int width = grid[0].length;
-        int height = grid.length;
+    private HashMap<Integer, Integer> HorizontalWordsFrequency = new HashMap<>();
+    private HashMap<Integer, Integer> VerticalWordsFrequency = new HashMap<>();
 
-        HashMap<Integer, Integer> HorizontalWordsFrequency = new HashMap<>();
-        HashMap<Integer, Integer> VerticalWordsFrequency = new HashMap<>();
+    public void map(){
+        width = grid[0].length;
+        height = grid.length;
 
         int spaceCounter;
         //conut horizontal words
@@ -60,8 +66,24 @@ public class EngLenChecker {
                 spaceCounter = 0;
             }
         }
-        System.out.println(HorizontalWordsFrequency);
-        System.out.println(VerticalWordsFrequency);
+        System.out.println("Map of horizontal words: " + HorizontalWordsFrequency);
+        System.out.println("Map of vertical words: " + VerticalWordsFrequency);
+        estimateFreq();
+    }
+
+    private void estimateFreq(){
+        int tot = HorizontalWordsFrequency.values().stream().reduce(0, (x, y) -> x + y) + VerticalWordsFrequency.values().stream().reduce(0, (x, y) -> x + y);
+        System.out.println("total of words: " + tot);
+        HashMap<Integer,Double> mergedMap = new HashMap<>();
+        for(int i = minWordLength; i <= maxWordLength; i++){
+            int res1 = HorizontalWordsFrequency.get(i) == null ? 0 : HorizontalWordsFrequency.get(i);
+            int res2 = VerticalWordsFrequency.get(i) == null ? 0 : VerticalWordsFrequency.get(i);
+            mergedMap.put(i, (double) res1 + res2);
+        }
+        
+        mergedMap.forEach((k, v) -> mergedMap.put(k, (v * 100)/tot));
+        System.out.println("percent of words " + mergedMap.values());
+        System.out.println("\n");
     }
 
 }

@@ -37,6 +37,7 @@ public abstract class GridGenerator {
 	 */
 	protected int maxWordLength = 13;
 
+	protected int minWordLength = 3;
 	/**
 	 * this is the checker used to see if a grid is valid or not
 	 */
@@ -97,6 +98,11 @@ public abstract class GridGenerator {
 		return this;
 	}
 
+	public GridGenerator setMinWordLength(int i) {
+		this.minWordLength = i;
+		return this;
+	}
+
 	/**
 	 * method used to set to true the orizontal mirroring of the grid
 	 * 
@@ -126,7 +132,7 @@ public abstract class GridGenerator {
 		gridChecker.finalHeight = height;
 		do {
 			this.gridChecker.checkConnections();
-		} while (this.gridChecker.checkMaxWordsLength());
+		} while (this.gridChecker.checkWordsLength());
 	}
 
 	@Override
