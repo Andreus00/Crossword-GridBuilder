@@ -17,25 +17,7 @@ public class main {
 				try{
 					for(a = 0; a < 10; a++){
 						char[][] grid = GridGeneratorIta.getBuilder().setSize(width, height).setVerticalMirror().setHorizontalMirror().setBlocks(width * height / 7).setMaxWordLength(13).setMinWordLength(3).build();
-						
-						// if(grid.checkMaxWordsLength()){
-						// 	System.out.println("Length");
-						// 	System.out.println(grid.toString());
-						// 	throw new Error();
-						// }
-						// if(!grid.checkConnections()){
-						// 	System.out.println("Connections");
-						// 	System.out.println(grid.toString());
-						// 	throw new Error();
-						// }
 
-						// System.out.println(a);
-						// System.out.println(grid.toString());
-
-						// // s.next();
-						
-
-						//System.out.println(GridGenerator.getBuilder().setSize(14, 14).setOrizontalMirror().setVerticalMirror().setDirt(0).build().toString());
 						try{
 							FileWriter myWriter = new FileWriter("GridGenerator\\src\\sanchietti\\crosstheword\\gridbuilder\\grids\\GridItaTest\\grid_" + width + "x" + height + "_" + type + "_" +a+".txt");
 							String s = "";
