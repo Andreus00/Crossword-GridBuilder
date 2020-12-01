@@ -3,18 +3,39 @@ package sanchietti.crosstheword.gridbuilder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
+/**
+ * This class is used to check if a grid has the right length of the words and 
+ * if there are zones not connected one to the others
+ */
 public class GridChecker {
-
-    private int width;
+	/**
+	 * data passed by the generator
+	 */
+	private int width;
+	/**
+	 * data passed by the generator
+	 */
 	private int height;
+	/**
+	 * data passed by the generator
+	 */
 	private int maxWordLength = 13;
+	/**
+	 * data passed by the generator
+	 */
 	private int minWordLength = 3;
 	
-
+	/**
+	 * data passed by the generator
+	 */
 	private char[][] grid;
-	
+	/**
+	 * data passed by the generator
+	 */
 	private boolean oMirror;
+	/**
+	 * data passed by the generator
+	 */
 	private boolean vMirror;
 
     public GridChecker(char[][] g, int w, int h, int blocks, int maxWL, int minWL, boolean oM, boolean vM){
@@ -27,10 +48,11 @@ public class GridChecker {
 		this.vMirror = vM;
 		this.finalWidth = this.width / (1 + (vMirror ? 1 : 0));
 		this.finalHeight = this.height / (1 + (oMirror ? 1 : 0));
-		this.finalBlocks = blocks;
     }
 
-    
+    /**
+	 * this class represents a single box of the grid
+	 */
 	private abstract class Box {
 		int x;
 		int y;
@@ -47,7 +69,9 @@ public class GridChecker {
 		@Override
 		public String toString(){ return x + " - " + y; }
 	}
-
+	/**
+	 * this class represents a single white box of the grid
+	 */
 	private class Space extends Box {
 
 		Zone z;
@@ -74,6 +98,9 @@ public class GridChecker {
 			this.z = null;
 		}
 	}
+	/**
+	 * this class represents a single black box of the grid
+	 */
 	private class Block extends Box {
 
 		HashSet<Zone> z = new HashSet<>();
@@ -103,7 +130,11 @@ public class GridChecker {
 
 
 	}
-
+	/**
+	 * this class represent a zone.
+	 * A zone is made of a group of white boxes surrounded by black boxes
+	 * you can add boxes to the zone, remove boxes from the zone and merge zones
+	 */
 	private class Zone {
 
 		HashSet<Space> spaces = new HashSet<>();
@@ -136,9 +167,13 @@ public class GridChecker {
 		
 	}
 
-
+	/**
+	 * a copy of the grid made of "Box" instead of "chars"
+	 */
 	private Box[][] boxGrid;
-
+	/**
+	 * set of the zones
+	 */
 	private HashSet<Zone> zones = new HashSet<>();
 
 
@@ -175,10 +210,13 @@ public class GridChecker {
 				recursiveSearch(el, newZone);
 			}
 	}
-
-	private int attemps = 15;
+	/**
+	 * max number of attempts that the algorithm can try before aborting the generation of the grid
+	 */
+	private int attempts = 15;
 
 	/**
+	 * this function tries to merge the zones in order create a single zone without a "wall" of blocks dividing it in 2 or more parts
 	 * returns true if there is only 1 zone
 	 * @return
 	 */
@@ -219,7 +257,7 @@ public class GridChecker {
 				break;
 			}
 			//if the for cicle ends without a merging it means that the last zone does not connect with the others.
-			//i have to delete a brick from the last zone and try again. Can i optimize the choice of the brick to delete? Yes: i can see near to the bricks if there are other bricks with zones. otherwise i go random (love going random)
+			//i have to delete a brick from the last zone and try again. Can i optimize the choice of the brick to delete? Yes: i can see near to the bricks if there are other bricks with zones. otherwise i go random (I love random)
 			if(!hasMerged){
 				//ah shit
 				try{
@@ -233,10 +271,10 @@ public class GridChecker {
 					zonesList = new ArrayList<>(zones);
 					zoneNumber = zones.size();
 					
-					if(attemps < 1 && zoneNumber > 1){
-						throw new IndexOutOfBoundsException("Out of attemps");
+					if(attempts < 1 && zoneNumber > 1){
+						throw new IndexOutOfBoundsException("Out of attempts");
 					}
-					attemps--;
+					attempts--;
 				}
 				
 			}
@@ -263,7 +301,7 @@ public class GridChecker {
 					for(Zone zone : nearBl.z){
 						if(zone == target)
 							continue;
-						//se il nearbl ha vicino una zona che non è la target, deve: creare un nuovo spazio; aggiungere lo spazio a boxgrid e alla propria zona, eliminare bl da target,
+						//if the nearby has a zone close to him which is not the target, he has to: generate a new space, add a space to the boxgrid and to his own zone, delete bl from the target
 						Space newSpace = new Space(bl.x, bl.y);
 						boxGrid[bl.y][bl.x] = newSpace;
 						grid[bl.y][bl.x] = ' ';
@@ -277,7 +315,7 @@ public class GridChecker {
 			}
 		}
 
-		// se l'algoritmo arriva a questo punto vuol dire che non ci sono zone in comune. Devo quindi scegliere un block a caso dai notConnected e trasformarlo in una zona
+		//there aren't common zoens: i have to delete a random block from the notConnected and create a new zone
 
 		Block notConnectedBlock = notConnected.get((int)((notConnected.size()-1)*Math.random()));
 		Space newSpace = new Space(notConnectedBlock.x, notConnectedBlock.y);
@@ -334,7 +372,6 @@ public class GridChecker {
 
 	int finalWidth;
 	int finalHeight;
-	int finalBlocks;
 
 		/**
 	 * returns true if the function has changed something in the grid
@@ -390,8 +427,6 @@ public class GridChecker {
 					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
 				} while ((lastPoint) * 2 > maxWordLength);
 				grid[i][finalWidth - lastPoint] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
 			}
 		}
 
@@ -405,7 +440,6 @@ public class GridChecker {
 					int start = j - spaceCounter;
 					int offset = (int) (Math.random() * spaceCounter);
 					grid[start + offset][i] = '*';
-					// System.out.println("New point at: " + i + " - " + start+offset);
 					// then i have to set the spaceCounter to j-positionOfNewPoint
 					spaceCounter = j - (start + offset);
 				}
@@ -435,8 +469,6 @@ public class GridChecker {
 					lastPoint = (int) (Math.random() * (spaceCounter) + 1);
 				} while ((lastPoint) * 2 > maxWordLength);
 				grid[finalHeight - lastPoint][i] = '*';
-				// System.out.println("Added Mirroring Point: " + i + " - " + (finalWidth -
-				// lastPoint));
 			}
 		}
 		return isChanged;

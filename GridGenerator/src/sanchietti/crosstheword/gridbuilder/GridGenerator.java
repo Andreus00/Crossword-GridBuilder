@@ -17,43 +17,58 @@ public abstract class GridGenerator {
 	 */
 	protected int height;
 	/**
-	 * number of blocks to generate
+	 * number of blocks to generate. 
+	 * This parameter may not be respected if there are too long words and so they have to be reduced (i suppose this is the right word ahahah)
 	 */
 	protected int blocks;
 	/**
-	 * orizontal mirror
+	 * Horizontal mirror
 	 */
-	protected boolean oMirror;
+	protected boolean hMirror;
 	/*
 	 * vertical mirror
 	 */
 	protected boolean vMirror;
 	/**
-	 * this parameter si used when the grid has to be mirrored. this value can be a
+	 * this parameter is used when the grid needs to be mirrored. this value can be a
 	 * number between 1 and 10. Higher is the number and higher is the chance of
 	 * every black box to not be copied
 	 */
 	protected int dirt = 0;
 	/**
-	 * this field is used to choose the maximum length oft the words
+	 * maximum length of the words
 	 */
 	protected int maxWordLength = 13;
-
+	/**
+	 * minimum length of the words
+	 */
 	protected int minWordLength = 3;
 	/**
-	 * this is the checker used to see if a grid is valid or not
+	 * checker used to see if a grid is valid or not
 	 */
 	protected GridChecker gridChecker;
-
+	/**
+	 * seconds to wait before abort the generation of a grid. (sometimes there are infinite loops with greater grids)
+	 */
 	protected final int TIMEOUT = 1; //sec
+	/**
+	 * value set at the beginning of the generation process of the grid
+	 */
 	protected double beginTime;
-
+	/**
+	 * width of the grid without mirroring
+	 */
 	protected int finalWidth;
+	/**
+	 * height of the grid without mirroring
+	 */
 	protected int finalHeight;
-	protected int finalBlocks;
 
 	protected GridGenerator() { }
-
+	/**
+	 * this method is the getter that needs to be overwritten by the classes that extends GridGenerator
+	 * @return
+	 */
 	public static GridGenerator getBuilder() {
 		throw new Error("Can not instantiate Grid builder");
 	};
@@ -102,22 +117,31 @@ public abstract class GridGenerator {
 		this.maxWordLength = i;
 		return this;
 	}
-
+	/**
+	 * method used to set the minimum numbers of characters for the words
+	 * 
+	 * @param i min number
+	 * @return this
+	 */
 	public GridGenerator setMinWordLength(int i) {
 		this.minWordLength = i;
 		return this;
 	}
 
 	/**
-	 * method used to set to true the orizontal mirroring of the grid
+	 * method used to set the horizontal mirroring of the grid to true 
 	 * 
 	 * @return
 	 */
 	public GridGenerator setHorizontalMirror() {
-		this.oMirror = true;
+		this.hMirror = true;
 		return this;
 	}
-
+	/**
+	 * setter for the dirt field
+	 * @param d
+	 * @return
+	 */
 	public GridGenerator setDirt(int d) {
 		if (d < 0 && d >= 10)
 			throw new IllegalArgumentException("The dirt value ca only be 0 <= dirt <= 10");
@@ -127,12 +151,13 @@ public abstract class GridGenerator {
 	
 	/**
 	 * method that builds the grid
-	 * 
 	 * @return
 	 * @throws TimeoutException
 	 */
 	public abstract char[][] build() throws TimeoutException;
-
+	/**
+	 * method that checks the grid and fixes long words or not connected zones
+	 */
 	protected void checkGrid() throws TimeoutException {
 		beginTime = System.nanoTime()/1e9;
 		gridChecker.finalWidth = width;
